@@ -1,6 +1,6 @@
 {
-  "name": "ai_plugin",
-  "version": "0.0.1",
+  "name": "@headlamp-k8s/headlamp-ai",
+  "version": "0.0.1-beta",
   "description": "Your Headlamp plugin",
   "scripts": {
     "start": "headlamp-plugin start",
@@ -30,7 +30,7 @@
     ]
   },
   "devDependencies": {
-    "@kinvolk/headlamp-plugin": "^0.9.0-alpha.2"
+    "@kinvolk/headlamp-plugin": "^0.9.0"
   },
   "dependencies": {
     "@azure/openai": "^1.0.0-beta.5",
