@@ -8,40 +8,31 @@ set -o nounset
 set -o pipefail
 
 # please update this variable when adding a new arguments
-TOTAL_CMD_ARGS=2
+TOTAL_CMD_ARGS=1
 
 if [[ $# -lt $TOTAL_CMD_ARGS ]]; then
     echo "usage:" >&2
-    echo "  $0 --app-name <APP_NAME> --docker-tag <DOCKER_TAG>" >&2
+    echo "  $0 --plugins-dir <PLUGINS_DIR>" >&2
     exit 1
 fi
 
 while [[ $# -gt 0 ]]; do
     key="$1"
     case $key in
-    -t | --docker-tag)
-        DOCKER_TAG="$2"
-        shift # past argument
-        shift # past value
-        ;;
-    -a | --app-name)
-        APP_NAME="$2"
+    -b | --plugins-dir)
+        PLUGINS_DIR="$2"
         shift # past argument
         shift # past value
         ;;
     esac
 done
 
-if [ -f "/etc/yum.repos.d/ol_artifacts.repo" ]; then
-    cp /etc/yum.repos.d/ol_artifacts.repo ./
-fi
-
 declare -A plugins_map
+# map in format 'plugin_name'='plugin_github_tag'
 plugins_map=(
   ["app-catalog"]="app-catalog-0.1.4"
 )
 
-PLUGINS_DIR="/tmp/headlamp-plugins"
 mkdir -p $PLUGINS_DIR
 
 for current_plugin in "${!plugins_map[@]}"; do
@@ -56,8 +47,4 @@ for current_plugin in "${!plugins_map[@]}"; do
   npx @kinvolk/headlamp-plugin extract . $PLUGINS_DIR/$current_plugin/
 done
 
-podman build --pull=never --squash \
-    --build-arg https_proxy=${https_proxy} \
-    -t ${DOCKER_TAG} -f ./olm/builds/Dockerfile .
 
-podman save -o ${APP_NAME}.tar ${DOCKER_TAG}

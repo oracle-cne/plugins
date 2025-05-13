@@ -1,3 +1,7 @@
 FROM container-registry.oracle.com/os/oraclelinux:8
 
-RUN mv /tmp/headlamp-plugins /
+ARG plugins-dir
+
+RUN mv ${plugins-dir} /
+
+WORKDIR /
