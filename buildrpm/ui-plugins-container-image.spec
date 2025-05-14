@@ -21,7 +21,7 @@ License:        Apache-2.0
 Group:          System/Management
 Url:            https://github.com/oracle-cne/plugins
 Source:         %{name}-%{version}.tar.bz2
-
+BuildRequires:  nodejs >= 18.14
 
 %description
 Plugins for the Oracle Cloud Native Environment UI.
