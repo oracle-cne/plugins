@@ -11,7 +11,7 @@
 %global app_version            2.1.0
 %global oracle_release_version 1
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
-%global plugins_dest           %{_builddir}/build-plugins
+%global plugins_dest           %{_builddir}/%{name}-%{version}/build-plugins
 
 Name:           %{app_name}-container-image
 Version:        %{app_version}
