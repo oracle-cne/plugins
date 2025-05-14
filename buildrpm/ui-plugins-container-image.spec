@@ -11,7 +11,7 @@
 %global app_version            2.1.0
 %global oracle_release_version 1
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
-%global plugins_dest           %{_builddir}/%{name}-%{version}/build-plugins
+%global plugins_dest           build-plugins
 
 Name:           %{app_name}-container-image
 Version:        %{app_version}
@@ -32,7 +32,7 @@ Plugins for the Oracle Cloud Native Environment UI.
 %build
 %global docker_tag %{registry}/%{app_name}:v%{version}
 chmod +x ./olm/build-plugins.sh
-./olm/build-plugins.sh --plugins-dir %{plugins_dest}
+./olm/build-plugins.sh --plugins-dir %{_builddir}/%{name}-%{version}/%{plugins_dest}
 
 podman build --pull=never --squash \
     --build-arg https_proxy=${https_proxy} \
