@@ -39,7 +39,7 @@ for current_plugin in "${!plugins_map[@]}"; do
   git clone --depth 1 --branch ${plugins_map[$current_plugin]} https://github.com/headlamp-k8s/plugins.git ${plugins_map[$current_plugin]}
   chmod +x ./buildrpm/app-catalog/patch.sh
   ./buildrpm/app-catalog/patch.sh ${plugins_map[$current_plugin]}
-  cd plugins/${plugins_map[$current_plugin]}/$current_plugin
+  pushd ${plugins_map[$current_plugin]}/$current_plugin
   npm install
   # Build the plugin
   npx @kinvolk/headlamp-plugin build .
@@ -47,6 +47,8 @@ for current_plugin in "${!plugins_map[@]}"; do
   mkdir -p $PLUGINS_DIR/$current_plugin
   # TODO add THIRD_PARTY_LICENSES.txt for respective plugins
   npx @kinvolk/headlamp-plugin extract . $PLUGINS_DIR/$current_plugin/
+  popd
+  rm -rf ${plugins_map[$current_plugin]}
 done
 
 
