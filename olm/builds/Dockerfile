@@ -1,7 +1,7 @@
 FROM container-registry.oracle.com/os/oraclelinux:8
 
-ARG plugins-dir
+ARG plugins_dir
 
-RUN mv ${plugins-dir} /
+RUN mv ${plugins_dir} /
 
 WORKDIR /

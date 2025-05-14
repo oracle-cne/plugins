@@ -1,0 +1,23 @@
+diff --git app-catalog/src/components/releases/EditorDialog.tsx app-catalog/src/components/releases/EditorDialog.tsx
+index 27777cf..403b062 100644
+--- app-catalog/src/components/releases/EditorDialog.tsx
++++ app-catalog/src/components/releases/EditorDialog.tsx
+@@ -15,6 +15,7 @@ import { useSnackbar } from 'notistack';
+ import { useEffect, useRef, useState } from 'react';
+ import { fetchChart, getActionStatus, upgradeRelease } from '../../api/releases';
+ import { jsonToYAML, yamlToJSON } from '../../helpers';
++import {APP_CATALOG_HELM_REPOSITORY} from "../charts/List";
+ 
+ export function EditorDialog(props: {
+   openEditor: boolean;
+@@ -56,7 +57,9 @@ export function EditorDialog(props: {
+ 
+   useEffect(() => {
+     if (isUpdateRelease) {
+-      fetchChart(release.chart.metadata.name).then(response => {
++      const metadataName =
++          release.chart.metadata.name === APP_CATALOG_HELM_REPOSITORY ? '/' + release.chart.metadata.name : release.chart.metadata.name;
++      fetchChart(metadataName).then(response => {
+         const charts = response.charts;
+         // sort by semantic versioning
+         const chartsCopy = _.cloneDeep(charts)

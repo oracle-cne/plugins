@@ -36,7 +36,7 @@ chmod +x ./olm/build-plugins.sh
 
 podman build --pull=never --squash \
     --build-arg https_proxy=${https_proxy} \
-    --build-arg plugins-dir=%{plugins_dest} \
+    --build-arg plugins_dir=%{plugins_dest} \
     -t %{docker_tag} -f ./olm/builds/Dockerfile .
 
 podman save -o %{app_name}.tar ${docker_tag}
