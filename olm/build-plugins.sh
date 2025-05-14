@@ -36,7 +36,8 @@ plugins_map=(
 mkdir -p $PLUGINS_DIR
 
 for current_plugin in "${!plugins_map[@]}"; do
-  git clone --depth 1 --branch ${plugins_map[$current_plugin]} https://github.com/headlamp-k8s/plugins.git
+#  git clone --depth 1 --branch ${plugins_map[$current_plugin]} https://github.com/headlamp-k8s/plugins.git
+  git checkout ${plugins_map[$current_plugin]}
   chmod +x ./buildrpm/app-catalog/patch.sh
   ./buildrpm/app-catalog/patch.sh
   cd plugins/$current_plugin
