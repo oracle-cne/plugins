@@ -39,7 +39,7 @@ podman build --pull=never --squash \
     --build-arg plugins_dir=%{plugins_dest} \
     -t %{docker_tag} -f ./olm/builds/Dockerfile .
 
-podman save -o %{app_name}.tar ${docker_tag}
+podman save -o %{app_name}.tar %{docker_tag}
 
 %install
 %__install -D -m 644 %{app_name}.tar %{buildroot}/usr/local/share/olcne/%{app_name}.tar
