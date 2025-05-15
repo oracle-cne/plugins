@@ -5,7 +5,8 @@
 
 set -o errexit
 set -o nounset
-set -o pipefail
+set -o pipefail:q
+
 
 # please update this variable when adding a new arguments
 TOTAL_CMD_ARGS=1
@@ -31,6 +32,7 @@ declare -A plugins_map
 # map in format 'plugin_name'='plugin_github_tag'
 plugins_map=(
   ["app-catalog"]="app-catalog-0.1.4"
+  ["prometheus"]="prometheus-0.5.0"
 )
 
 mkdir -p $PLUGINS_DIR
