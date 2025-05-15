@@ -38,8 +38,10 @@ mkdir -p $PLUGINS_DIR
 
 for current_plugin in "${!plugins_map[@]}"; do
   git clone --depth 1 --branch ${plugins_map[$current_plugin]} https://github.com/headlamp-k8s/plugins.git ${plugins_map[$current_plugin]}
-  chmod +x ./buildrpm/app-catalog/patch.sh
-  ./buildrpm/app-catalog/patch.sh ${plugins_map[$current_plugin]}
+  if [ -d ./buildrpm/$current_plugin ] && [ -f ./buildrpm/$current_plugin/patch.sh ]; then
+    chmod +x ./buildrpm/$current_plugin/patch.sh
+    ./buildrpm/$current_plugin/patch.sh ${plugins_map[$current_plugin]}
+  fi
   pushd ${plugins_map[$current_plugin]}/$current_plugin
   npm install
   # Build the plugin
