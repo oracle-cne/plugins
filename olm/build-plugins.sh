@@ -5,8 +5,7 @@
 
 set -o errexit
 set -o nounset
-set -o pipefail:q
-
+set -o pipefail
 
 # please update this variable when adding a new arguments
 TOTAL_CMD_ARGS=1
