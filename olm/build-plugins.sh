@@ -32,6 +32,7 @@ declare -A plugins_map
 plugins_map=(
   ["app-catalog"]="app-catalog-0.1.4"
   ["prometheus"]="prometheus-0.5.0"
+  ["plugin-catalog"]="plugin-catalog-0.3.1"
 )
 
 mkdir -p $PLUGINS_DIR
