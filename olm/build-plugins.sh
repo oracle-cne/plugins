@@ -33,6 +33,7 @@ plugins_map=(
   ["app-catalog"]="app-catalog-0.1.4"
   ["prometheus"]="prometheus-0.5.0"
   ["plugin-catalog"]="plugin-catalog-0.3.1"
+  ["cert-manager"]="cert-manager-0.1.0"
 )
 
 mkdir -p $PLUGINS_DIR
