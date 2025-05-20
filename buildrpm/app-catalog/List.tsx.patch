@@ -1,5 +1,5 @@
 diff --git app-catalog/src/components/charts/List.tsx app-catalog/src/components/charts/List.tsx
-index bfa5808..29f4918 100644
+index bfa5808..a1fd94d 100644
 --- app-catalog/src/components/charts/List.tsx
 +++ app-catalog/src/components/charts/List.tsx
 @@ -21,10 +21,12 @@ import {
@@ -12,7 +12,7 @@ index bfa5808..29f4918 100644
  //import { createRelease } from '../../api/releases';
  import { EditorDialog } from './EditorDialog';
  import { SettingsLink } from './SettingsLink';
-+import * as global from "global";
++//import * as global from "global";
  
  interface AppCatalogConfig {
    /**
@@ -55,7 +55,7 @@ index bfa5808..29f4918 100644
            const response: any = await fetchCharts(search, showOnlyVerified, chartCategory, page);
 -          setCharts(response.dataResponse.packages);
 -          setChartsTotalCount(parseInt(response.total));
-+          if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
++          if (globalThis.CHART_PROFILE === VANILLA_HELM_REPO) {
 +            setCharts(response.dataResponse.entries);
 +            setChartsTotalCount(parseInt(response.total));
 +            // Capture available versions from the response and set AVAILABLE_VERSIONS
@@ -247,7 +247,7 @@ index bfa5808..29f4918 100644
 +        }
 +  }, [charts]);
 +
-+  if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
++  if (globalThis.CHART_PROFILE === VANILLA_HELM_REPO) {
 +    return (
 +      <>
 +        <EditorDialog

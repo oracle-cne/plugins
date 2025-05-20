@@ -55,7 +55,7 @@ index dc019e2..18b9ff0 100644
 +        parent: 'Helm',
 +        label: chart[i].displayName,
 +      });
-
+ 
 -  registerRoute({
 -    path: '/helm/:namespace/releases/:releaseName',
 -    sidebar: 'Releases',
@@ -102,7 +102,7 @@ index dc019e2..18b9ff0 100644
 +  exact: true,
 +  component: () => <ReleaseList />,
 +});
-
+ 
 +registerRoute({
 +  path: '/helm/:namespace/releases/:releaseName',
 +  sidebar: 'Releases',
@@ -120,7 +120,7 @@ index dc019e2..18b9ff0 100644
      component: () => <ChartsList />,
    });
 +}
-
+ 
 -  registerRoute({
 -    path: '/helm/:repoName/charts/:chartName',
 -    sidebar: 'Charts',
@@ -135,7 +135,7 @@ index dc019e2..18b9ff0 100644
 +  exact: true,
 +  component: () => <ChartDetails />,
 +});
-
+ 
 -  registerRoute({
 -    path: '/settings/plugins/app-catalog',
 -    sidebar: 'Charts',
@@ -151,5 +151,5 @@ index dc019e2..18b9ff0 100644
 +  exact: true,
 +  component: () => <AppCatalogSettings />,
 +});
-
+ 
  registerPluginSettings('app-catalog', AppCatalogSettings, false);
