@@ -1,5 +1,5 @@
 diff --git app-catalog/src/api/charts.tsx app-catalog/src/api/charts.tsx
-index 171cef3..3ab9d9e 100644
+index 94f5cef..5dc76bf 100644
 --- app-catalog/src/api/charts.tsx
 +++ app-catalog/src/api/charts.tsx
 @@ -1,4 +1,18 @@
@@ -20,9 +20,9 @@ index 171cef3..3ab9d9e 100644
 +  return new URLSearchParams({ request: url }).toString();
 +};
  
- export function fetchChartsFromArtifact(
+ export async function fetchChartsFromArtifact(
    search: string = '',
-@@ -6,6 +20,39 @@ export function fetchChartsFromArtifact(
+@@ -7,6 +21,39 @@ export async function fetchChartsFromArtifact(
    page: number,
    limit: number = PAGE_OFFSET_COUNT_FOR_CHARTS
  ) {
@@ -59,10 +59,10 @@ index 171cef3..3ab9d9e 100644
 +  }
 +
 +  // App-catalog desktop version
-   if (!category || category.value === 0) {
-     return fetch(
-       `https://artifacthub.io/api/v1/packages/search?kind=0&ts_query_web=${search}&sort=relevance&facets=true&limit=${limit}&offset=${
-@@ -21,6 +68,15 @@ export function fetchChartsFromArtifact(
+   // note: we are currently defaulting to search by verified and official as default
+   const url = new URL('https://artifacthub.io/api/v1/packages/search');
+   url.searchParams.set('offset', ((page - 1) * limit).toString());
+@@ -30,6 +77,16 @@ export async function fetchChartsFromArtifact(
  }
  
  export function fetchChartDetailFromArtifact(chartName: string, repoName: string) {
@@ -75,10 +75,11 @@ index 171cef3..3ab9d9e 100644
 +  }
 +
 +  // Use /externalproxy for App-catalog desktop version
++
    return fetch(`http://localhost:4466/externalproxy`, {
      headers: {
        'Forward-To': `https://artifacthub.io/api/v1/packages/helm/${repoName}/${chartName}`,
-@@ -29,9 +85,37 @@ export function fetchChartDetailFromArtifact(chartName: string, repoName: string
+@@ -38,9 +95,39 @@ export function fetchChartDetailFromArtifact(chartName: string, repoName: string
  }
  
  export function fetchChartValues(packageID: string, packageVersion: string) {
@@ -110,10 +111,11 @@ index 171cef3..3ab9d9e 100644
      },
    }).then(response => response.text());
  }
++
 +export async function  fetchChartIcon(iconName: string) {
 +  const url =
 +      `${SERVICE_PROXY}/${CATALOG_NAMESPACE}/${CATALOG_NAME}?` +
 +      getURLSearchParams(`${iconName}`);
 +  return request(url, {isJSON: false}, true, true, {}).then(response => response);
 +}
-\ No newline at end of file
++

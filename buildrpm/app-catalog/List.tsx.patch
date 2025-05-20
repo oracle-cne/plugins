@@ -1,18 +1,23 @@
 diff --git app-catalog/src/components/charts/List.tsx app-catalog/src/components/charts/List.tsx
-index 619cc31..bc98381 100644
+index bfa5808..1efb3c7 100644
 --- app-catalog/src/components/charts/List.tsx
 +++ app-catalog/src/components/charts/List.tsx
-@@ -19,12 +19,31 @@ import {
+@@ -21,10 +21,12 @@ import {
  import { Autocomplete, Pagination } from '@mui/material';
- import { useEffect, useState } from 'react';
+ import { useEffect, useRef, useState } from 'react';
  //import { jsonToYAML, yamlToJSON } from '../../helpers';
 -import { fetchChartsFromArtifact } from '../../api/charts';
 +import {fetchChartIcon, fetchChartsFromArtifact} from '../../api/charts';
 +import { AvailableComponentVersions } from '../../helpers/catalog';
  //import { createRelease } from '../../api/releases';
  import { EditorDialog } from './EditorDialog';
--
+ import { SettingsLink } from './SettingsLink';
 +import * as global from "global";
+ 
+ interface AppCatalogConfig {
+   /**
+@@ -38,6 +40,24 @@ const useStoreConfig = store.useConfig();
+ 
  export const PAGE_OFFSET_COUNT_FOR_CHARTS = 9;
  
 +export const VANILLA_HELM_REPO = 'VANILLA_HELM_REPOSITORY';
@@ -33,33 +38,39 @@ index 619cc31..bc98381 100644
 +  var AVAILABLE_VERSIONS: Map<any, any[]>;
 +}
 +
- export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
-   const helmChartCategoryList = [
-     { title: 'All', value: 0 },
-@@ -44,11 +63,18 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+ interface SearchProps {
+   search: string;
+   setSearch: React.Dispatch<React.SetStateAction<string>>;
+@@ -150,6 +170,7 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
    const [chartCategory, setChartCategory] = useState(helmChartCategoryList[0]);
    const [search, setSearch] = useState('');
    const [selectedChartForInstall, setSelectedChartForInstall] = useState<any | null>(null);
 +  const [iconUrls, setIconUrls] = useState<{ [url: string]: string }>({}); // New state for multiple icon URLs
  
-   useEffect(() => {
-     setCharts(null);
-     fetchCharts(search, chartCategory, page).then(response => {
--      setCharts(response.packages);
-+      if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
-+        setCharts(response.entries);
-+        // Capture available versions from the response and set AVAILABLE_VERSIONS
-+        globalThis.AVAILABLE_VERSIONS = AvailableComponentVersions(response.entries);
-+      } else {
-+        setCharts(response.packages);
-+      }
-       const facets = response.facets;
-       const categoryOptions = facets.find(
-         (facet: {
-@@ -81,6 +107,69 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
-   }, [page, chartCategory, search]);
+   // note: since we default to true for showOnlyVerified and the settings page is not accessible from anywhere else but the list comp
+   // we must have the default value here and have it imported for use in the settings tab
+@@ -169,8 +190,14 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+       async function fetchData() {
+         try {
+           const response: any = await fetchCharts(search, showOnlyVerified, chartCategory, page);
+-          setCharts(response.dataResponse.packages);
+-          setChartsTotalCount(parseInt(response.total));
++          if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
++            setCharts(response.dataResponse.entries);
++            // Capture available versions from the response and set AVAILABLE_VERSIONS
++            globalThis.AVAILABLE_VERSIONS = AvailableComponentVersions(response.dataResponse.entries);
++          } else {
++            setCharts(response.dataResponse.packages);
++            setChartsTotalCount(parseInt(response.total));
++          }
+         } catch (err) {
+           console.error('Error fetching charts', err);
+           setCharts([]);
+@@ -182,7 +209,329 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+     [page, chartCategory, search, showOnlyVerified]
+   );
  
-   useEffect(() => {
++  useEffect(() => {
 +        if (charts && Object.keys(charts).length > 0) {
 +            const fetchIcons = async () => {
 +                try {
@@ -122,456 +133,266 @@ index 619cc31..bc98381 100644
 +        }
 +    }, [charts]);
 +
-+    useEffect(() => {
-     setPage(1);
-   }, [chartCategory, search]);
- 
-@@ -138,150 +227,322 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
-     );
-   }
- 
--  return (
--    <>
--      <EditorDialog
--        openEditor={openEditor}
--        chart={selectedChartForInstall}
--        handleEditor={(open: boolean) => setEditorOpen(open)}
--      />
--      <SectionHeader title="Applications" actions={[<Search />, <CategoryForCharts />]} />
--      <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignContent="start">
--        {!charts ? (
--          <Box
--            style={{
--              margin: '0 auto',
--            }}
--          >
--            <Loader title="" />
--          </Box>
--        ) : charts.length === 0 ? (
--          <Box mt={2} mx={2}>
--            <Typography variant="h5" component="h2">
--              {`No charts found for ${
--                search ? `search term: ${search}` : `category: ${chartCategory.title}`
--              }`}
--            </Typography>
--          </Box>
--        ) : (
--          charts.map(chart => {
--            return (
--              <Box maxWidth="30%" width="400px" m={1}>
--                <Card>
--                  <Box height="60px" display="flex" alignItems="center" marginTop="15px">
--                    <CardMedia
--                      image={`https://artifacthub.io/image/${chart.logo_image_id}`}
--                      style={{
--                        width: '60px',
--                        margin: '1rem',
--                      }}
--                      component="img"
--                    />
-+  if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
-+    return (
-+      <>
-+        <EditorDialog
-+          openEditor={openEditor}
-+          chart={selectedChartForInstall}
-+          handleEditor={(open: boolean) => setEditorOpen(open)}
-+        />
-+        {/* Removed the drop-down for categories */}
-+        <SectionHeader title="Applications" actions={[<Search />]} />
-+        <Box display="flex" flexWrap="wrap"  justifyContent="space-between" alignContent="start">
-+          {!charts ? (
-+            <Box
-+              style={{
-+                margin: '0 auto',
-+              }}
-+            >
-+              <Loader title="" />
-+            </Box>
-+          ) : charts.length === 0 ? (
-+            <Box mt={2} mx={2}>
-+              <Typography variant="h5" component="h2">
-+                {`No charts found for ${
-+                  search ? `search term: ${search}` : `category: ${chartCategory.title}`
++if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
+   return (
++    <>
++      <EditorDialog
++        openEditor={openEditor}
++        chart={selectedChartForInstall}
++        handleEditor={(open: boolean) => setEditorOpen(open)}
++      />
++      <SectionHeader 
++        title="Applications"
++        titleSideActions={[<SettingsLink />]}
++        actions={[
++          <Search search={search} setSearch={setSearch} />, 
++          <CategoryForCharts
++            helmChartCategoryList={helmChartCategoryList}
++            chartCategory={chartCategory}
++            setChartCategory={setChartCategory}
++          />,
++        ]}
++      />
++      <Box>
++        {!charts ? (
++          <Box
++            sx={{
++              margin: '0 auto',
++            }}
++          >
++            <Loader title="" />
++          </Box>
++        ) : charts.length === 0 ? (
++          <Box mt={2} mx={2}>
++            <Typography variant="h5" component="h2">
++              {`No charts found for ${search ? `search term: ${search}` : `category: ${chartCategory.title}`
 +                }`}
-+              </Typography>
-+            </Box>
-+          ) : (
-+            // Filter out the charts meeting the value entered for search field and display only the matching charts
-+            Object.keys(
-+              Object.keys(charts)
-+                .filter(key => key.match(search))
-+                .reduce((obj, key) => {
-+                  return Object.assign(obj, {
-+                    [key]: charts[key],
-+                  });
-+                }, {})
-+            ).map(chartName => {
++            </Typography>
++          </Box>
++        ) : (
++          <Box
++            display="flex"
++            m={1}
++            sx={{
++              flexWrap: 'wrap',
++              flexDirection: { sm: 'column', md: 'row' },
++            }}
++          >
++            {
++             // Filter out the charts meeting the value entered for search field and display only the matching charts
++             Object.keys(
++               Object.keys(charts)
++                 .filter(key => key.match(search))
++                 .reduce((obj, key) => {
++                   return Object.assign(obj, {
++                     [key]: charts[key],
++                   });
++                 }, {})
++             ).map(chartName => {
 +              // When a chart contains multiple versions, only display the first version
 +              return charts[chartName].slice(0, 1).map(chart => {
-+                return (
-+                  // TODO: There is some alignment problem where last row has an empty middle box
-+                  <Box  maxWidth="30%" width="400px" m={1}>
-+                    <Card key={chart.icon}>
-+                      <Box height="60px" display="flex" alignItems="center" marginTop="15px">
-+                        {/* Do not display icon, when it is not specified */}
-+
-+                              <CardMedia
-+                                  image={iconUrls[chart.icon] || ''}
-+                                  style={{
-+                                      width: '60px',
-+                                      margin: '1rem',
-+                                  }}
-+                                  component="img"
-+                              />
-+                      </Box>
-+                      <CardContent
-+                        style={{
-+                          margin: '1rem 0rem',
-+                          height: '15vh',
-+                          overflow: 'hidden',
-+                          paddingTop: 0,
-+                        }}
-+                      >
-+                        <Box
-+                          style={{
-+                            overflow: 'hidden',
-+                            textOverflow: 'ellipsis',
-+                            whiteSpace: 'nowrap',
-+                          }}
-+                        >
-+                          <Tooltip title={chart.name}>
-+                            <Typography component="h5" variant="h5">
-+                              {/* TODO: The app-catalog using artifacthub.io loads the details about the chart with an option to install the chart
-+                                        Fix this for vanilla helm repo */}
-+                              {chart.name}
-+                            </Typography>
-+                          </Tooltip>
-+                        </Box>
-+                        <Box display="flex" justifyContent="space-between" my={1}>
-+                          {/* If the chart.version contains v prefix, remove it */}
-+                          {chart.version.startsWith('v') ? (
-+                            <Typography>{chart.version}</Typography>
-+                          ) : (
-+                            <Typography>v{chart.version}</Typography>
-+                          )}
-+                          <Box
-+                            marginLeft={1}
-+                            style={{
-+                              overflow: 'hidden',
-+                              textOverflow: 'ellipsis',
-+                              whiteSpace: 'nowrap',
-+                            }}
-+                          >
-+                            {/* Repository name is not mandatory */}
-+                            <Tooltip title={chart?.repository?.name || ''}>
-+                              <span>{chart?.repository?.name || ''}</span>
-+                            </Tooltip>
-+                          </Box>
-+                        </Box>
-+                        <Divider />
-+                        <Box mt={1}>
-+                          <Typography>
-+                            {chart?.description?.slice(0, 100)}
-+                            {chart?.description?.length > 100 && (
-+                              <Tooltip title={chart?.description}>
-+                                <span>…</span>
-+                              </Tooltip>
-+                            )}
-+                          </Typography>
-+                        </Box>
-+                      </CardContent>
-+                      <CardActions
-+                        style={{
-+                          justifyContent: 'space-between',
-+                          padding: '14px',
-+                        }}
-+                      >
-+                        <Button
-+                          style={{
-+                            backgroundColor: '#000',
-+                            color: 'white',
-+                            textTransform: 'none',
-+                          }}
-+                          onClick={() => {
-+                            setSelectedChartForInstall(chart);
-+                            setEditorOpen(true);
-+                          }}
-+                        >
-+                          Install
-+                        </Button>
-+                        {/*
-+                            Provide Learn More link only when the chart has source
-+                            When there are multiple sources for a chart, use the first source for the link, rather than using comma separated values
-+                          */}
-+                        {!chart?.sources ? (
-+                          ''
-+                        ) : chart.sources.length === 1 ? (
-+                          <Link href={chart?.sources} target="_blank">
-+                            Learn More
-+                          </Link>
-+                        ) : (
-+                          <Link href={chart?.sources[0]} target="_blank">
-+                            Learn More
-+                          </Link>
-+                        )}
-+                      </CardActions>
-+                    </Card>
-                   </Box>
--                  <CardContent
--                    style={{
--                      margin: '1rem 0rem',
--                      height: '25vh',
--                      overflow: 'hidden',
--                      paddingTop: 0,
--                    }}
--                  >
--                    <Box
-+                );
-+              });
-+            })
-+          )}
-+        </Box>
-+        {charts && charts.length !== 0 && (
-+          <Box mt={2} mx="auto" maxWidth="max-content">
-+            <Pagination
-+              size="large"
-+              shape="rounded"
-+              page={page}
-+              count={Math.floor(chartsTotalCount / PAGE_OFFSET_COUNT_FOR_CHARTS)}
-+              color="primary"
-+              onChange={(e, page: number) => {
-+                setPage(page);
-+              }}
-+            />
-+          </Box>
-+        )}
-+      </>
-+    );
-+  } else {
-+    return (
-+      <>
-+        <EditorDialog
-+          openEditor={openEditor}
-+          chart={selectedChartForInstall}
-+          handleEditor={(open: boolean) => setEditorOpen(open)}
-+        />
-+        <SectionHeader title="Applications" actions={[<Search />, <CategoryForCharts />]} />
-+        <Box display="flex" flexWrap="wrap" justifyContent="space-between" alignContent="start">
-+          {!charts ? (
-+            <Box
-+              style={{
-+                margin: '0 auto',
-+              }}
-+            >
-+              <Loader title="" />
-+            </Box>
-+          ) : charts.length === 0 ? (
-+            <Box mt={2} mx={2}>
-+              <Typography variant="h5" component="h2">
-+                {`No charts found for ${
-+                  search ? `search term: ${search}` : `category: ${chartCategory.title}`
-+                }`}
-+              </Typography>
-+            </Box>
-+          ) : (
-+            charts.map(chart => {
 +              return (
-+                <Box maxWidth="30%" width="400px" m={1}>
-+                  <Card>
-+                    <Box height="60px" display="flex" alignItems="center" marginTop="15px">
++                <Card key={chart.icon} sx={{
++                  margin: '1rem',
++                  display: 'flex',
++                  flexDirection: 'column',
++                  height: '100%',
++                  boxShadow: '0px 0px 5px 0px rgba(0,0,0,0.5)',
++                  width: {
++                    md: '40%',
++                    lg: '30%',
++                  },
++                }}>
++                  <Box
++                    height="60px"
++                    display="flex"
++                    alignItems="center"
++                    justifyContent="space-between"
++                    marginTop="15px"
++                  >
++                    {iconUrls[chart.icon] && (
 +                      <CardMedia
-+                        image={`https://artifacthub.io/image/${chart.logo_image_id}`}
-+                        style={{
++                        image={iconUrls[chart.icon]}
++                        alt={`${chart.name} logo`}
++                        sx={{
 +                          width: '60px',
++                          height: '60px',
 +                          margin: '1rem',
++                          alignSelf: 'flex-start',
++                          objectFit: 'contain',
 +                        }}
 +                        component="img"
 +                      />
++                    )}
++                    <Box
++                      display="flex"
++                      alignItems="center"
++                      marginLeft="auto"
++                      marginRight="10px"
++                    >
++                      {(chart.cncf || chart.repository.cncf) && (
++                        <Tooltip title="CNCF Project">
++                          <Icon
++                            icon="simple-icons:cncf"
++                            style={{
++                              marginLeft: '0.5em',
++                              fontSize: '20px',
++                            }}
++                          />
++                        </Tooltip>
++                      )}
++                      {(chart.official || chart.repository.official) && (
++                        <Tooltip title="Official Chart">
++                          <Icon
++                            icon="mdi:star-circle"
++                            style={{
++                              marginLeft: '0.5em',
++                              fontSize: '22px',
++                            }}
++                          />
++                        </Tooltip>
++                      )}
++                      {chart.repository.verified_publisher && (
++                        <Tooltip title="Verified Publisher">
++                          <Icon
++                            icon="mdi:check-decagram"
++                            style={{
++                              marginLeft: '0.5em',
++                              fontSize: '22px',
++                            }}
++                          />
++                        </Tooltip>
++                      )}
 +                    </Box>
-+                    <CardContent
-                       style={{
-+                        margin: '1rem 0rem',
-+                        height: '25vh',
-                         overflow: 'hidden',
--                        textOverflow: 'ellipsis',
--                        whiteSpace: 'nowrap',
-+                        paddingTop: 0,
-                       }}
-                     >
--                      <Tooltip title={chart.name}>
--                        <Typography component="h5" variant="h5">
--                          <RouterLink
--                            routeName="/helm/:repoName/charts/:chartName"
--                            params={{
--                              chartName: chart.name,
--                              repoName: chart.repository.name,
--                            }}
--                          >
--                            {chart.name}
--                          </RouterLink>
--                        </Typography>
--                      </Tooltip>
--                    </Box>
--                    <Box display="flex" justifyContent="space-between" my={1}>
--                      <Typography>v{chart.version}</Typography>
-                       <Box
--                        marginLeft={1}
-                         style={{
-                           overflow: 'hidden',
-                           textOverflow: 'ellipsis',
-                           whiteSpace: 'nowrap',
-                         }}
-                       >
--                        <Tooltip title={chart?.repository?.name || ''}>
--                          <span>{chart?.repository?.name || ''}</span>
-+                        <Tooltip title={chart.name}>
-+                          <Typography component="h5" variant="h5">
-+                            <RouterLink
-+                              routeName="/helm/:repoName/charts/:chartName"
-+                              params={{
-+                                chartName: chart.name,
-+                                repoName: chart.repository.name,
-+                              }}
-+                            >
-+                              {chart.name}
-+                            </RouterLink>
-+                          </Typography>
-                         </Tooltip>
-                       </Box>
--                    </Box>
--                    <Divider />
--                    <Box mt={1}>
--                      <Typography>
--                        {chart?.description?.slice(0, 100)}
--                        {chart?.description?.length > 100 && (
--                          <Tooltip title={chart?.description}>
--                            <span>…</span>
-+                      <Box display="flex" justifyContent="space-between" my={1}>
-+                        <Typography>v{chart.version}</Typography>
-+                        <Box
-+                          marginLeft={1}
-+                          style={{
-+                            overflow: 'hidden',
-+                            textOverflow: 'ellipsis',
-+                            whiteSpace: 'nowrap',
-+                          }}
-+                        >
-+                          <Tooltip title={chart?.repository?.name || ''}>
-+                            <span>{chart?.repository?.name || ''}</span>
-                           </Tooltip>
--                        )}
--                      </Typography>
--                    </Box>
--                  </CardContent>
--                  <CardActions
--                    style={{
--                      justifyContent: 'space-between',
--                      padding: '14px',
--                    }}
--                  >
--                    <Button
-+                        </Box>
-+                      </Box>
-+                      <Divider />
-+                      <Box mt={1}>
-+                        <Typography>
-+                          {chart?.description?.slice(0, 100)}
-+                          {chart?.description?.length > 100 && (
-+                            <Tooltip title={chart?.description}>
-+                              <span>…</span>
-+                            </Tooltip>
-+                          )}
++                  </Box>
++                  <CardContent
++                    sx={{
++                      margin: '1rem 0rem',
++                      height: '25vh',
++                      overflow: 'hidden',
++                      paddingTop: 0,
++                    }}
++                  >
++                    <Box
++                      sx={{
++                        overflow: 'hidden',
++                        textOverflow: 'ellipsis',
++                        whiteSpace: 'nowrap',
++                      }}
++                    >
++                      <Tooltip title={chart.name}>
++                        <Typography component="h2" variant="h5">
++                        {/* TODO: The app-catalog using artifacthub.io loads the details about the chart with an option to install the chart
++                                  Fix this for vanilla helm repo */}
++                          <RouterLink
++                            routeName="/helm/:repoName/charts/:chartName"
++                            params={{
++                              chartName: chart.name,
++                              repoName: chart.repository.name,
++                            }}
++                          >
++                            {chart.name}
++                          </RouterLink>
 +                        </Typography>
-+                      </Box>
-+                    </CardContent>
-+                    <CardActions
-                       style={{
--                        backgroundColor: '#000',
--                        color: 'white',
--                        textTransform: 'none',
--                      }}
--                      onClick={() => {
--                        setSelectedChartForInstall(chart);
--                        setEditorOpen(true);
-+                        justifyContent: 'space-between',
-+                        padding: '14px',
-                       }}
-                     >
--                      Install
--                    </Button>
--                    <Link href={chart?.repository?.url} target="_blank">
--                      Learn More
--                    </Link>
--                  </CardActions>
--                </Card>
--              </Box>
--            );
--          })
-+                      <Button
-+                        style={{
-+                          backgroundColor: '#000',
-+                          color: 'white',
-+                          textTransform: 'none',
-+                        }}
-+                        onClick={() => {
-+                          setSelectedChartForInstall(chart);
-+                          setEditorOpen(true);
++                      </Tooltip>
++                    </Box>
++                    <Box display="flex" justifyContent="space-between" my={1}>
++                     {/* If the chart.version contains v prefix, remove it */}
++                         {chart.version.startsWith('v') ? (
++                           <Typography>{chart.version}</Typography>
++                         ) : (
++                            <Typography>v{chart.version}</Typography>
++                         )}
++                      <Box
++                        marginLeft={1}
++                        sx={{
++                          overflow: 'hidden',
++                          textOverflow: 'ellipsis',
++                          whiteSpace: 'nowrap',
 +                        }}
 +                      >
-+                        Install
-+                      </Button>
-+                      <Link href={chart?.repository?.url} target="_blank">
-+                        Learn More
-+                      </Link>
-+                    </CardActions>
-+                  </Card>
-+                </Box>
-+              );
-+            })
-+          )}
-+        </Box>
-+        {charts && charts.length !== 0 && (
-+          <Box mt={2} mx="auto" maxWidth="max-content">
-+            <Pagination
-+              size="large"
-+              shape="rounded"
-+              page={page}
-+              count={Math.floor(chartsTotalCount / PAGE_OFFSET_COUNT_FOR_CHARTS)}
-+              color="primary"
-+              onChange={(e, page: number) => {
-+                setPage(page);
-+              }}
-+            />
++                        <Tooltip title={chart?.repository?.name || ''}>
++                          <Typography>{chart?.repository?.name || ''}</Typography>
++                        </Tooltip>
++                      </Box>
++                    </Box>
++                    <Divider />
++                    <Box mt={1}>
++                      <Typography>
++                        {chart?.description?.slice(0, 100)}
++                        {chart?.description?.length > 100 && (
++                          <Tooltip title={chart?.description}>
++                            <span>…</span>
++                          </Tooltip>
++                        )}
++                      </Typography>
++                    </Box>
++                  </CardContent>
++                  <CardActions
++                    sx={{
++                      justifyContent: 'space-between',
++                      padding: '14px',
++                    }}
++                  >
++                    <Button
++                      sx={{
++                        backgroundColor: '#000',
++                        color: 'white',
++                        textTransform: 'none',
++                        '&:hover': {
++                          background: '#605e5c',
++                        },
++                      }}
++                      onClick={() => {
++                        setSelectedChartForInstall(chart);
++                        setEditorOpen(true);
++                      }}
++                    >
++                      Install
++                    </Button>
++                    {/*
++                        Provide Learn More link only when the chart has source
++                        When there are multiple sources for a chart, use the first source for the link, rather than using comma separated values
++                      */}
++                    {!chart?.sources ? (
++                      ''
++                    ) : chart.sources.length === 1 ? (
++                       <Link href={chart?.sources} target="_blank">
++                         Learn More
++                       </Link>
++                    ) : (
++                       <Link href={chart?.sources[0]} target="_blank">
++                         Learn More
++                       </Link>
++                    )}
++                    <Link href={chart?.repository?.url} target="_blank">
++                      Learn More
++                    </Link>
++                  </CardActions>
++                </Card>
++              );//Internal return
++              });//external return
++            })}
 +          </Box>
-         )}
--      </Box>
--      {charts && charts.length !== 0 && (
--        <Box mt={2} mx="auto" maxWidth="max-content">
--          <Pagination
--            size="large"
--            shape="rounded"
--            page={page}
--            count={Math.floor(chartsTotalCount / PAGE_OFFSET_COUNT_FOR_CHARTS)}
--            color="primary"
--            onChange={(e, page: number) => {
--              setPage(page);
--            }}
--          />
-+        <Box textAlign="right">
-+          <Link href="https://artifacthub.io/" target="_blank">
-+            Powered by ArtifactHub
-+          </Link>
-         </Box>
--      )}
--      <Box textAlign="right">
--        <Link href="https://artifacthub.io/" target="_blank">
--          Powered by ArtifactHub
--        </Link>
--      </Box>
--    </>
--  );
-+      </>
-+    );
-+  }
- }
++        )}
++      </Box>
++      {charts && charts.length !== 0 && (
++        <Box mt={2} mx="auto" maxWidth="max-content">
++          <Pagination
++            size="large"
++            shape="rounded"
++            page={page}
++            count={Math.ceil(chartsTotalCount / PAGE_OFFSET_COUNT_FOR_CHARTS)}
++            color="primary"
++            onChange={(e, page: number) => {
++              setPage(page);
++            }}
++          />
++        </Box>
++      )}
++    </>
++  );
++} else {
+     <>
+       <EditorDialog
+         openEditor={openEditor}

@@ -30,7 +30,7 @@ done
 declare -A plugins_map
 # map in format 'plugin_name'='plugin_github_tag'
 plugins_map=(
-  ["app-catalog"]="app-catalog-0.1.4"
+  ["app-catalog"]="app-catalog-0.6.0"
   ["prometheus"]="prometheus-0.5.0"
   ["plugin-catalog"]="plugin-catalog-0.3.1"
   ["cert-manager"]="cert-manager-0.1.0"
