@@ -1,5 +1,5 @@
 diff --git app-catalog/src/components/charts/List.tsx app-catalog/src/components/charts/List.tsx
-index bfa5808..1efb3c7 100644
+index 6537520..1b783e1 100644
 --- app-catalog/src/components/charts/List.tsx
 +++ app-catalog/src/components/charts/List.tsx
 @@ -21,10 +21,12 @@ import {
@@ -7,7 +7,7 @@ index bfa5808..1efb3c7 100644
  import { useEffect, useRef, useState } from 'react';
  //import { jsonToYAML, yamlToJSON } from '../../helpers';
 -import { fetchChartsFromArtifact } from '../../api/charts';
-+import {fetchChartIcon, fetchChartsFromArtifact} from '../../api/charts';
++import { fetchChartIcon, fetchChartsFromArtifact } from '../../api/charts';
 +import { AvailableComponentVersions } from '../../helpers/catalog';
  //import { createRelease } from '../../api/releases';
  import { EditorDialog } from './EditorDialog';
@@ -41,7 +41,7 @@ index bfa5808..1efb3c7 100644
  interface SearchProps {
    search: string;
    setSearch: React.Dispatch<React.SetStateAction<string>>;
-@@ -150,6 +170,7 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -147,6 +167,7 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
    const [chartCategory, setChartCategory] = useState(helmChartCategoryList[0]);
    const [search, setSearch] = useState('');
    const [selectedChartForInstall, setSelectedChartForInstall] = useState<any | null>(null);
@@ -49,7 +49,7 @@ index bfa5808..1efb3c7 100644
  
    // note: since we default to true for showOnlyVerified and the settings page is not accessible from anywhere else but the list comp
    // we must have the default value here and have it imported for use in the settings tab
-@@ -169,8 +190,14 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -166,8 +187,15 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
        async function fetchData() {
          try {
            const response: any = await fetchCharts(search, showOnlyVerified, chartCategory, page);
@@ -57,6 +57,7 @@ index bfa5808..1efb3c7 100644
 -          setChartsTotalCount(parseInt(response.total));
 +          if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
 +            setCharts(response.dataResponse.entries);
++            setChartsTotalCount(parseInt(response.total));
 +            // Capture available versions from the response and set AVAILABLE_VERSIONS
 +            globalThis.AVAILABLE_VERSIONS = AvailableComponentVersions(response.dataResponse.entries);
 +          } else {
@@ -66,7 +67,7 @@ index bfa5808..1efb3c7 100644
          } catch (err) {
            console.error('Error fetching charts', err);
            setCharts([]);
-@@ -182,7 +209,329 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -179,6 +207,329 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
      [page, chartCategory, search, showOnlyVerified]
    );
  
@@ -134,7 +135,7 @@ index bfa5808..1efb3c7 100644
 +    }, [charts]);
 +
 +if (global.CHART_PROFILE === VANILLA_HELM_REPO) {
-   return (
++  return (
 +    <>
 +      <EditorDialog
 +        openEditor={openEditor}
@@ -393,6 +394,6 @@ index bfa5808..1efb3c7 100644
 +    </>
 +  );
 +} else {
+   return (
      <>
        <EditorDialog
-         openEditor={openEditor}
