@@ -1,5 +1,5 @@
 diff --git app-catalog/src/components/releases/EditorDialog.tsx app-catalog/src/components/releases/EditorDialog.tsx
-index efda7e2..09091b8 100644
+index efda7e2..5cf2d86 100644
 --- app-catalog/src/components/releases/EditorDialog.tsx
 +++ app-catalog/src/components/releases/EditorDialog.tsx
 @@ -16,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
@@ -20,3 +20,12 @@ index efda7e2..09091b8 100644
          } catch (err) {
            error = err;
          }
+@@ -74,7 +76,7 @@ export function EditorDialog(props: {
+         }
+ 
+         if (!!error) {
+-          enqueueSnackbar(`Error fetching chart versions: ${error}`, {
++          enqueueSnackbar(`Error fetching chart versions: ${error.message}`, {
+             variant: 'error',
+             autoHideDuration: 5000,
+           });
