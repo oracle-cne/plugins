@@ -1,5 +1,5 @@
 diff --git app-catalog/src/api/charts.tsx app-catalog/src/api/charts.tsx
-index 94f5cef..bb9369f 100644
+index 94f5cef..8f9ccd2 100644
 --- app-catalog/src/api/charts.tsx
 +++ app-catalog/src/api/charts.tsx
 @@ -1,4 +1,18 @@
@@ -38,11 +38,11 @@ index 94f5cef..bb9369f 100644
 +      // in yaml as the default format, although latest versions support generating the file in json format.
 +      // The API yamlToJSON works for the response in yaml as well as json format.
 +      const response = request(url, { isJSON: false }, true, true, {})
-+      const dataResponse = response.text().then(yamlResponse => yamlToJSON(yamlResponse))
++      const yamlResponse = await response.text();
++      console.log(yamlResponse);
++      const jsonData = yamlToJSON(yamlResponse);
 +      const total = response.headers.get('pagination-total-count');
-+//      return request(url, { isJSON: false }, true, true, {})
-+//        .then(response => response.text())
-+//        .then(yamlResponse => yamlToJSON(yamlResponse));
++      
 +      return { dataResponse, total };
 +    } else if (CHART_PROFILE === COMMUNITY_REPO) {
 +      let requestParam = '';
