@@ -1,5 +1,5 @@
 diff --git app-catalog/src/components/charts/EditorDialog.tsx app-catalog/src/components/charts/EditorDialog.tsx
-index e7d104b..d2882b1 100644
+index e7d104b..01f4a9f 100644
 --- app-catalog/src/components/charts/EditorDialog.tsx
 +++ app-catalog/src/components/charts/EditorDialog.tsx
 @@ -10,6 +10,8 @@ import { fetchChartDetailFromArtifact, fetchChartValues } from '../../api/charts
@@ -36,20 +36,25 @@ index e7d104b..d2882b1 100644
      const packageVersion = selectedVersion?.value ?? chart.version;
      setChartValuesLoading(true);
      fetchChartValues(packageID, packageVersion)
-@@ -75,12 +92,20 @@ export function EditorDialog(props: {
+@@ -73,14 +90,22 @@ export function EditorDialog(props: {
+   }
+ 
    useEffect(() => {
-     setChartInstallDescription(`${chart.name} deployment`);
-     fetchChartDetailFromArtifact(chart.name, chart.repository.name).then(response => {
+-    setChartInstallDescription(`${chart.name} deployment`);
+-    fetchChartDetailFromArtifact(chart.name, chart.repository.name).then(response => {
 -      if (response.available_versions) {
 -        const availableVersions = response.available_versions.map(({ version }) => ({ title: version, value: version }));
 -        setVersions(availableVersions);
 -        setSelectedVersion(availableVersions[0]);
 -      }
-     });
+-    });
 +    if (globalThis.CHART_PROFILE === VANILLA_HELM_REPO) {
 +      const versionsArray = AVAILABLE_VERSIONS.get(chart.name);
++      const availableVersions = versionsArray.map(({ version }) => ({ title: version, value: version }));
 +      // @ts-ignore
-+      setVersions(versionsArray.map(({ version }) => ({ title: version, value: version })));
++      setVersions(availableVersions);
++      setChartInstallDescription(`${chart.name} deployment`);
++      setSelectedVersion(availableVersions[0]);
 +    } else {
 +      fetchChartDetailFromArtifact(chart.name, chart.repository.name).then(response => {
 +        if (response.available_versions) {

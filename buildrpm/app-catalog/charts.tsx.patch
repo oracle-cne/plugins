@@ -1,5 +1,5 @@
 diff --git app-catalog/src/api/charts.tsx app-catalog/src/api/charts.tsx
-index 94f5cef..7930a67 100644
+index 94f5cef..25ba41a 100644
 --- app-catalog/src/api/charts.tsx
 +++ app-catalog/src/api/charts.tsx
 @@ -1,4 +1,18 @@
@@ -22,7 +22,7 @@ index 94f5cef..7930a67 100644
  
  export async function fetchChartsFromArtifact(
    search: string = '',
-@@ -7,6 +21,47 @@ export async function fetchChartsFromArtifact(
+@@ -7,6 +21,46 @@ export async function fetchChartsFromArtifact(
    page: number,
    limit: number = PAGE_OFFSET_COUNT_FOR_CHARTS
  ) {
@@ -41,7 +41,6 @@ index 94f5cef..7930a67 100644
 +      //  .then(response => response.text())
 +      //  .then(yamlResponse => yamlToJSON(yamlResponse));
 +      const dataResponse = await request(url, { isJSON: false }, true, true, {});
-+      console.error('drsp:', dataResponse); 
 +      const total=0;
 +      return { dataResponse, total };
 +    } else if (CHART_PROFILE === COMMUNITY_REPO) {
@@ -70,7 +69,7 @@ index 94f5cef..7930a67 100644
    // note: we are currently defaulting to search by verified and official as default
    const url = new URL('https://artifacthub.io/api/v1/packages/search');
    url.searchParams.set('offset', ((page - 1) * limit).toString());
-@@ -30,6 +85,16 @@ export async function fetchChartsFromArtifact(
+@@ -30,6 +84,16 @@ export async function fetchChartsFromArtifact(
  }
  
  export function fetchChartDetailFromArtifact(chartName: string, repoName: string) {
@@ -87,7 +86,7 @@ index 94f5cef..7930a67 100644
    return fetch(`http://localhost:4466/externalproxy`, {
      headers: {
        'Forward-To': `https://artifacthub.io/api/v1/packages/helm/${repoName}/${chartName}`,
-@@ -38,9 +103,39 @@ export function fetchChartDetailFromArtifact(chartName: string, repoName: string
+@@ -38,9 +102,39 @@ export function fetchChartDetailFromArtifact(chartName: string, repoName: string
  }
  
  export function fetchChartValues(packageID: string, packageVersion: string) {

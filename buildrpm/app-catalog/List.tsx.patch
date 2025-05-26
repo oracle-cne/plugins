@@ -1,5 +1,5 @@
 diff --git app-catalog/src/components/charts/List.tsx app-catalog/src/components/charts/List.tsx
-index bfa5808..c29b6c1 100644
+index bfa5808..d92cca6 100644
 --- app-catalog/src/components/charts/List.tsx
 +++ app-catalog/src/components/charts/List.tsx
 @@ -20,11 +20,13 @@ import {
@@ -73,7 +73,7 @@ index bfa5808..c29b6c1 100644
          } catch (err) {
            console.error('Error fetching charts', err);
            setCharts([]);
-@@ -182,232 +212,556 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -182,232 +212,555 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
      [page, chartCategory, search, showOnlyVerified]
    );
  
@@ -414,7 +414,7 @@ index bfa5808..c29b6c1 100644
 +                      <CardContent
 +                        sx={{
 +                          margin: '1rem 0rem',
-+                          height: '25vh',
++                          height: '10vh',
 +                          overflow: 'hidden',
 +                          paddingTop: 0,
 +                        }}
@@ -430,15 +430,17 @@ index bfa5808..c29b6c1 100644
 +                            <Typography component="h2" variant="h5">
 +                            {/* TODO: The app-catalog using artifacthub.io loads the details about the chart with an option to install the chart
 +                                      Fix this for vanilla helm repo */}
++                                { /*
 +                              <RouterLink
 +                                routeName="/helm/:repoName/charts/:chartName"
 +                                params={{
 +                                  chartName: chart.name,
-+                                  repoName: chart.repository.name,
++                                  repoName: APP_CATALOG_HELM_REPOSITORY,
 +                                }}
 +                              >
 +                                {chart.name}
-+                              </RouterLink>
++                              </RouterLink> */}
++                                {chart.name}
 +                            </Typography>
 +                          </Tooltip>
 +                        </Box>
@@ -509,7 +511,7 @@ index bfa5808..c29b6c1 100644
 +                          */}
 +                        {!chart?.sources ? (
 +                          ''
-+                        ) : chart.sources.length === 1 ? (
++                        ) : chart?.sources?.length === 1 ? (
 +                           <Link href={chart?.sources} target="_blank">
 +                             Learn More
 +                           </Link>
@@ -518,9 +520,6 @@ index bfa5808..c29b6c1 100644
 +                             Learn More
 +                           </Link>
 +                        )}
-+                        <Link href={chart?.repository?.url} target="_blank">
-+                          Learn More
-+                        </Link>
 +                      </CardActions>
 +                    </Card>
 +                  );//Internal return
@@ -631,7 +630,7 @@ index bfa5808..c29b6c1 100644
 +                          marginLeft="auto"
 +                          marginRight="10px"
 +                        >
-+                          {(chart.cncf || chart.repository.cncf) && (
++                          {(chart?.cncf || chart?.repository?.cncf) && (
 +                            <Tooltip title="CNCF Project">
 +                              <Icon
 +                                icon="simple-icons:cncf"
@@ -642,7 +641,7 @@ index bfa5808..c29b6c1 100644
 +                              />
 +                            </Tooltip>
 +                          )}
-+                          {(chart.official || chart.repository.official) && (
++                          {(chart?.official || chart?.repository?.official) && (
 +                            <Tooltip title="Official Chart">
 +                              <Icon
 +                                icon="mdi:star-circle"
@@ -653,7 +652,7 @@ index bfa5808..c29b6c1 100644
 +                              />
 +                            </Tooltip>
 +                          )}
-+                          {chart.repository.verified_publisher && (
++                          {chart?.repository?.verified_publisher && (
 +                            <Tooltip title="Verified Publisher">
 +                              <Icon
 +                                icon="mdi:check-decagram"
@@ -701,7 +700,7 @@ index bfa5808..c29b6c1 100644
 +                                routeName="/helm/:repoName/charts/:chartName"
 +                                params={{
 +                                  chartName: chart.name,
-+                                  repoName: chart.repository.name,
++                                  repoName: chart?.repository?.name,
 +                                }}
 +                              >
 +                                {chart.name}
