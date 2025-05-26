@@ -1,12 +1,14 @@
 diff --git app-catalog/src/components/charts/List.tsx app-catalog/src/components/charts/List.tsx
-index bfa5808..a1fd94d 100644
+index bfa5808..c29b6c1 100644
 --- app-catalog/src/components/charts/List.tsx
 +++ app-catalog/src/components/charts/List.tsx
-@@ -21,10 +21,12 @@ import {
+@@ -20,11 +20,13 @@ import {
+ } from '@mui/material';
  import { Autocomplete, Pagination } from '@mui/material';
  import { useEffect, useRef, useState } from 'react';
- //import { jsonToYAML, yamlToJSON } from '../../helpers';
+-//import { jsonToYAML, yamlToJSON } from '../../helpers';
 -import { fetchChartsFromArtifact } from '../../api/charts';
++import { yamlToJSON } from '../../helpers';
 +import { fetchChartIcon, fetchChartsFromArtifact } from '../../api/charts';
 +import { AvailableComponentVersions } from '../../helpers/catalog';
  //import { createRelease } from '../../api/releases';
@@ -49,25 +51,29 @@ index bfa5808..a1fd94d 100644
  
    // note: since we default to true for showOnlyVerified and the settings page is not accessible from anywhere else but the list comp
    // we must have the default value here and have it imported for use in the settings tab
-@@ -169,8 +190,15 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -168,9 +189,18 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+ 
        async function fetchData() {
          try {
-           const response: any = await fetchCharts(search, showOnlyVerified, chartCategory, page);
+-          const response: any = await fetchCharts(search, showOnlyVerified, chartCategory, page);
 -          setCharts(response.dataResponse.packages);
 -          setChartsTotalCount(parseInt(response.total));
++          const response = await fetchCharts(search, showOnlyVerified, chartCategory, page);
++          const data = await response.dataResponse.text();
++          const d=yamlToJSON(data);
 +          if (globalThis.CHART_PROFILE === VANILLA_HELM_REPO) {
-+            setCharts(response.dataResponse.entries);
++            setCharts(d.entries);
 +            setChartsTotalCount(parseInt(response.total));
 +            // Capture available versions from the response and set AVAILABLE_VERSIONS
-+            globalThis.AVAILABLE_VERSIONS = AvailableComponentVersions(response.dataResponse.entries);
++            globalThis.AVAILABLE_VERSIONS = AvailableComponentVersions(d.entries);
 +          } else {
-+            setCharts(response.dataResponse.packages);
++            setCharts(d.packages);
 +            setChartsTotalCount(parseInt(response.total));
 +          }
          } catch (err) {
            console.error('Error fetching charts', err);
            setCharts([]);
-@@ -182,232 +210,556 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
+@@ -182,232 +212,556 @@ export function ChartsList({ fetchCharts = fetchChartsFromArtifact }) {
      [page, chartCategory, search, showOnlyVerified]
    );
  
@@ -370,7 +376,7 @@ index bfa5808..a1fd94d 100644
 +                          marginLeft="auto"
 +                          marginRight="10px"
 +                        >
-+                          {(chart.cncf || chart.repository.cncf) && (
++                          {(chart?.cncf || chart?.repository?.cncf) && (
 +                            <Tooltip title="CNCF Project">
 +                              <Icon
 +                                icon="simple-icons:cncf"
@@ -381,7 +387,7 @@ index bfa5808..a1fd94d 100644
 +                              />
 +                            </Tooltip>
 +                          )}
-+                          {(chart.official || chart.repository.official) && (
++                          {(chart?.official || chart?.repository?.official) && (
 +                            <Tooltip title="Official Chart">
 +                              <Icon
 +                                icon="mdi:star-circle"
@@ -392,7 +398,7 @@ index bfa5808..a1fd94d 100644
 +                              />
 +                            </Tooltip>
 +                          )}
-+                          {chart.repository.verified_publisher && (
++                          {chart?.repository?.verified_publisher && (
 +                            <Tooltip title="Verified Publisher">
 +                              <Icon
 +                                icon="mdi:check-decagram"
