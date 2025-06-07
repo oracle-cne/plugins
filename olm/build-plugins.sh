@@ -36,15 +36,18 @@ plugins_map=(
 )
 
 mkdir -p $PLUGINS_DIR
+current_branch=$(git branch --show-current)
 
 for current_plugin in "${!plugins_map[@]}"; do
-  git branch -lr
-  git tag -n
+  git fetch origin --tags
   # Build app-catalog from main branch which has cherry-picked commits of serviceproxy-app-catalog branch
   # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
   if [[ "$current_plugin" != "app-catalog" ]];then
     git checkout ${plugins_map[$current_plugin]}
+  else
+    git checkout $current_branch
   fi
+
   pushd $current_plugin
   npm install
   # Build the plugin
