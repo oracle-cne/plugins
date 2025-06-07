@@ -38,6 +38,8 @@ plugins_map=(
 mkdir -p $PLUGINS_DIR
 
 for current_plugin in "${!plugins_map[@]}"; do
+  git branch -lr
+  git tag -n
   # Build app-catalog from main branch which has cherry-picked commits of serviceproxy-app-catalog branch
   # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
   if [[ "$current_plugin" != "app-catalog" ]];then
