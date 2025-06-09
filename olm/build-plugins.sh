@@ -59,3 +59,5 @@ for current_plugin in "${!plugins_map[@]}"; do
   popd
 done
 
+# Switch to Oracle's branch to build container image
+git checkout $current_branch
