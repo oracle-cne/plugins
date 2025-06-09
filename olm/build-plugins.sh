@@ -36,7 +36,8 @@ plugins_map=(
 )
 
 mkdir -p $PLUGINS_DIR
-current_branch=$(git rev-parse --abbrev-ref HEAD)
+echo "from env=$GIT_BRANCH"
+current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
   git fetch origin --tags
