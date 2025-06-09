@@ -36,7 +36,6 @@ plugins_map=(
 )
 
 mkdir -p $PLUGINS_DIR
-echo "from env=$GIT_BRANCH"
 current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
@@ -62,3 +61,7 @@ done
 
 # Switch to Oracle's branch to build container image
 git checkout $current_branch
+
+for current_plugin in "${!plugins_map[@]}"; do
+  cp buildrpm/THIRD_PARTY_LICENSES_$current_plugin.txt $PLUGINS_DIR/$current_plugin/THIRD_PARTY_LICENSES.txt
+done
