@@ -39,10 +39,10 @@ mkdir -p $PLUGINS_DIR
 current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
-  #git fetch origin --tags
-  # Build app-catalog from main branch which has cherry-picked commits of serviceproxy-app-catalog branch
-  # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
+  git fetch origin --tags
+
   git checkout ${plugins_map[$current_plugin]}
+  # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
   if [[ "$current_plugin" == "app-catalog" ]];then
     git cherry-pick -x 5ff3eac0667431e162eca4841a4fa607063cdc08
   fi
