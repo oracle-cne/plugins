@@ -5,7 +5,7 @@ String version = '2.1.0'
 String imgTag  = "v" + version
 
 olcnePipeline(
-        branchPattern: new BranchPattern(master: "oracle/release/" + version, feature: 'feature/.*'),
+        branchPattern: new BranchPattern(master: "oracle/release/" + version, feature: '(?!^release/.*$)(^.*$)'),
         containers: [('container-registry.oracle.com/olcne/ui-plugins:' + imgTag): 'olcne/ui-plugins:' + imgTag],
         platforms: ['ol8'],
         architectures: ['x86_64', 'aarch64'],
