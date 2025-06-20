@@ -1,7 +1,0 @@
-licenses:
-  - name: app-catalog
-    path: /headlamp-plugins/app-catalog/THIRD_PARTY_LICENSES.txt
-  - name: prometheus
-    path: /headlamp-plugins/prometheus/THIRD_PARTY_LICENSES.txt
-  - name: cert-manager
-    path: /headlamp-plugins/cert-manager/THIRD_PARTY_LICENSES.tx
