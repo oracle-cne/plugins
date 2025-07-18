@@ -9,7 +9,7 @@
 %{!?registry: %global registry container-registry.oracle.com/olcne}
 %global app_name               ui-plugins
 %global app_version            2.0.0
-%global oracle_release_version 5
+%global oracle_release_version 6
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 %global plugins_dest           build-plugins
 
@@ -49,6 +49,9 @@ podman save -o %{app_name}.tar %{docker_tag}
 /usr/local/share/olcne/%{app_name}.tar
 
 %changelog
+* Fri Jul 18 2025 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-6
+- Rebuild with the latest base image
+
 * Sat Jun 07 2025 Murali Annamneni <murali.annamneni@oracle.com> - 2.0.0-5
 - Update app-catalog to 0.6.1
 - Add prometheus-0.6.0 plugin
