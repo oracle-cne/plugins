@@ -50,7 +50,7 @@ podman save -o %{app_name}.tar %{docker_tag}
 
 %changelog
 * Fri Jul 18 2025 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-6
-- Rebuild with the latest base image
+- Bump plugin versions for CVE-2025-6547
 
 * Sat Jun 07 2025 Murali Annamneni <murali.annamneni@oracle.com> - 2.0.0-5
 - Update app-catalog to 0.6.1
