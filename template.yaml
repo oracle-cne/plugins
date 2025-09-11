@@ -4,3 +4,4 @@ Comparator: 0
 MasterBranchTemplate: "oracle/release/${plugin}-${major}.${minor}.${patch}"
 TemplateDirectory: "${plugin}-v${major}.${minor}"
 SemverTagFilter: ">= 0.0.0"
+TagSemverFormat: "${major}.${minor}.${patch}"
