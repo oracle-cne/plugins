@@ -1,0 +1,6 @@
+---
+TagFormat: "(?P<plugin>[a-zA-Z-]+)-(?P<major>[0-9])\\.(?P<minor>[0-9]+)\\.(?P<patch>[0-9]+)(-alpha|-beta)?"
+Comparator: 0
+MasterBranchTemplate: "oracle/release/${plugin}-${major}.${minor}.${patch}"
+TemplateDirectory: "${plugin}-v${major}.${minor}"
+SemverTagFilter: ">= 0.0.0"
