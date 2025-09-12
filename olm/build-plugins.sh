@@ -28,23 +28,23 @@ while [[ $# -gt 0 ]]; do
 done
 
 declare -A plugins_map
-# map in the format 'plugin_name'='plugin_github_tag'
+# map in the format 'plugin_name'='plugin-oracle_release_branch'
 plugins_map=(
-  ["app-catalog"]="app-catalog-0.6.2"
-  ["prometheus"]="prometheus-0.7.1"
-  ["cert-manager"]="cert-manager-0.1.0"
+  ["app-catalog"]="oracle/release/app-catalog-0.6.2"
+  ["prometheus"]="oracle/release/prometheus-0.7.2"
+  ["cert-manager"]="oracle/release/cert-manager-0.1.0"
+  ["ai-assistant"]="oracle/release/ai-assistant-0.1.0"
 )
 
 mkdir -p $PLUGINS_DIR
 current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
-  git fetch origin --tags
 
   git checkout ${plugins_map[$current_plugin]}
   # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
   if [[ "$current_plugin" == "app-catalog" ]];then
-    git -c user.name="Murali Annamneni" -c user.email="murali.annamneni@oracle.com" cherry-pick -x 5ff3eac0667431e162eca4841a4fa607063cdc08
+    git -c user.name="Murali Annamneni" -c user.email="murali.annamneni@oracle.com" cherry-pick -x bd8c52c9770169fdb77a75e90473af44eb59ec30
   fi
 
   pushd $current_plugin
@@ -54,6 +54,7 @@ for current_plugin in "${!plugins_map[@]}"; do
   # Extract the built plugin files to a folder named build
   mkdir -p $PLUGINS_DIR/$current_plugin
   npx @kinvolk/headlamp-plugin extract . $PLUGINS_DIR/$current_plugin/
+  # TODO - copy license text from respective plugin branches
   popd
 done
 
