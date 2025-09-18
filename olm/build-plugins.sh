@@ -51,16 +51,13 @@ for current_plugin in "${!plugins_map[@]}"; do
   npm install
   # Build the plugin
   npx @kinvolk/headlamp-plugin build .
-  # Extract the built plugin files to a folder named build
+  # Extract built plugin files to a folder named build
   mkdir -p $PLUGINS_DIR/$current_plugin
   npx @kinvolk/headlamp-plugin extract . $PLUGINS_DIR/$current_plugin/
-  # TODO - copy license text from respective plugin branches
+
+  cp ./THIRD_PARTY_LICENSES.txt $PLUGINS_DIR/$current_plugin/THIRD_PARTY_LICENSES.txt
   popd
 done
 
-# Switch to Oracle's branch to build container image
+# Switch to orphan branch to build container image
 git checkout $current_branch
-
-for current_plugin in "${!plugins_map[@]}"; do
-  cp buildrpm/THIRD_PARTY_LICENSES_$current_plugin.txt $PLUGINS_DIR/$current_plugin/THIRD_PARTY_LICENSES.txt
-done
