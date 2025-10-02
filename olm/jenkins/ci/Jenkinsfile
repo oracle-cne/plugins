@@ -12,8 +12,4 @@ olcnePipeline(
         publishImage: false,
         yumOL8Repos: ['ol8_appstream'],
         ol8ModulesToEnable: ['nodejs:20'],
-	preBuildCommands: [
-		'podman pull container-registry.oracle.com/olcne/base:latest',
-		'podman tag container-registry.oracle.com/olcne/base:latest container-registry.oracle.com/os/oraclelinux:8',
-	],
 )

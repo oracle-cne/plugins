@@ -34,7 +34,7 @@ Plugins for the Oracle Cloud Native Environment UI.
 chmod +x ./olm/build-plugins.sh
 ./olm/build-plugins.sh --plugins-dir %{_builddir}/%{name}-%{version}/%{plugins_dest}
 
-podman build --pull=never --squash \
+podman build --pull --squash \
     --build-arg https_proxy=${https_proxy} \
     --build-arg plugins_dir=%{plugins_dest} \
     -t %{docker_tag} -f ./olm/builds/Dockerfile .
