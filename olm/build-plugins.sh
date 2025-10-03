@@ -55,7 +55,7 @@ for current_plugin in "${!plugins_map[@]}"; do
   mkdir -p $PLUGINS_DIR/$current_plugin
   npx @kinvolk/headlamp-plugin extract . $PLUGINS_DIR/$current_plugin/
 
-  cp ./THIRD_PARTY_LICENSES.txt $PLUGINS_DIR/$current_plugin/THIRD_PARTY_LICENSES.txt
+  cp ../THIRD_PARTY_LICENSES.txt $PLUGINS_DIR/$current_plugin/THIRD_PARTY_LICENSES.txt
   popd
 done
 
