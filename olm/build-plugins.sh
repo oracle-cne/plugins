@@ -44,7 +44,7 @@ for current_plugin in "${!plugins_map[@]}"; do
   git checkout ${plugins_map[$current_plugin]}
   # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
   if [[ "$current_plugin" == "app-catalog" ]];then
-    git -c user.name="Murali Annamneni" -c user.email="murali.annamneni@oracle.com" cherry-pick -x bd8c52c9770169fdb77a75e90473af44eb59ec30
+    git -c user.name="Murali Annamneni" -c user.email="murali.annamneni@oracle.com" cherry-pick -x 1a2186db51e1835723beabf1040fd090ed92b062
   fi
 
   pushd $current_plugin
