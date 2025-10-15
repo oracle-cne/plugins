@@ -9,7 +9,7 @@
 %{!?registry: %global registry container-registry.oracle.com/olcne}
 %global app_name               ui-plugins
 %global app_version            2.0.0
-%global oracle_release_version 7
+%global oracle_release_version 8
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 %global plugins_dest           build-plugins
 
@@ -49,6 +49,9 @@ podman save -o %{app_name}.tar %{docker_tag}
 /usr/local/share/olcne/%{app_name}.tar
 
 %changelog
+* Wed Oct 08 2025 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-8
+- Rebuild with the latest base image
+
 * Fri Sep 12 2025 Murali Annamneni <murali.annamneni@oracle.com> - 2.0.0-7
 - Add ai-assistant plugin
 
