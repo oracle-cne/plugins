@@ -41,7 +41,7 @@ current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
 
-  git checkout ${plugins_map[$current_plugin]}
+  git checkout -f ${plugins_map[$current_plugin]}
   pushd $current_plugin
   npm install
   # Build the plugin
