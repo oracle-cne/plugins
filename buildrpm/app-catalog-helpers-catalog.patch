@@ -1,0 +1,18 @@
+diff --git src/helpers/catalog.ts src/helpers/catalog.ts
+index e21ab2d..19eb94f 100644
+--- src/helpers/catalog.ts
++++ src/helpers/catalog.ts
+@@ -1,9 +1,9 @@
+ import { fetchCatalogs } from '../api/catalogs';
+ 
+-const ANNOTATION_URI = 'catalog.headlamp.dev/uri';
+-const ANNOTATION_NAME = 'catalog.headlamp.dev/name';
+-const ANNOTATION_PROTOCOL = 'catalog.headlamp.dev/protocol';
+-const ANNOTATION_DISPLAY_NAME = 'catalog.headlamp.dev/displayName';
++const ANNOTATION_URI = 'catalog.ocne.io/uri';
++const ANNOTATION_NAME = 'catalog.ocne.io/name';
++const ANNOTATION_PROTOCOL = 'catalog.ocne.io/protocol';
++const ANNOTATION_DISPLAY_NAME = 'catalog.ocne.io/displayName';
+ 
+ const DEFAULT_CATALOG_NAME = 'app-catalog';
+ const DEFAULT_CATALOG_NAMESPACE = 'headlamp-system';
