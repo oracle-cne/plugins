@@ -30,24 +30,25 @@ done
 declare -A plugins_map
 # map in the format 'plugin_name'='plugin-oracle_release_branch'
 plugins_map=(
-  ["app-catalog"]="oracle/release/app-catalog-0.6.2"
-  ["prometheus"]="oracle/release/prometheus-0.7.2"
+  ["app-catalog"]="oracle/release/app-catalog-0.8.0"
+  ["prometheus"]="oracle/release/prometheus-0.8.2"
   ["cert-manager"]="oracle/release/cert-manager-0.1.0"
   ["ai-assistant"]="oracle/release/ai-assistant-0.1.0"
 )
+
+cp ./buildrpm/*.patch /tmp/
 
 mkdir -p $PLUGINS_DIR
 current_branch=$(git name-rev --name-only HEAD)
 
 for current_plugin in "${!plugins_map[@]}"; do
 
-  git checkout ${plugins_map[$current_plugin]}
-  # TODO Remove this check after serviceproxy-app-catalog PR merged upstream
-  if [[ "$current_plugin" == "app-catalog" ]];then
-    git -c user.name="Murali Annamneni" -c user.email="murali.annamneni@oracle.com" cherry-pick -x 1a2186db51e1835723beabf1040fd090ed92b062
-  fi
-
+  git checkout -f ${plugins_map[$current_plugin]}
   pushd $current_plugin
+  if [[ "$current_plugin" == "app-catalog" ]];then
+    patch -p0 < /tmp/app-catalog-api-catalogs.patch
+    patch -p0 < /tmp/app-catalog-helpers-catalog.patch
+  fi
   npm install
   # Build the plugin
   npx @kinvolk/headlamp-plugin build .
@@ -60,4 +61,4 @@ for current_plugin in "${!plugins_map[@]}"; do
 done
 
 # Switch to orphan branch to build container image
-git checkout $current_branch
+git checkout -f $current_branch

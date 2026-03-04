@@ -1,0 +1,22 @@
+diff --git src/api/catalogs.tsx src/api/catalogs.tsx
+index ec474da..408b167 100644
+--- src/api/catalogs.tsx
++++ src/api/catalogs.tsx
+@@ -4,7 +4,7 @@ import { COMMUNITY_REPO, VANILLA_HELM_REPO } from '../constants/catalog';
+ import { setCatalogConfig } from './catalogConfig';
+ 
+ const SERVICE_ENDPOINT = '/api/v1/services';
+-const LABEL_CATALOG = 'catalog.headlamp.dev/is-catalog';
++const LABEL_CATALOG = 'catalog.ocne.io/is-catalog';
+ 
+ /**
+  * Resets the global variables used for chart configuration.
+@@ -66,7 +66,7 @@ export function CommunityChartList(metadataName: string, namespace: string, char
+  * @returns  A promise resolving to the response from the request.
+  */
+ export function fetchCatalogs() {
+-  // Use query parameter to fetch the services with label catalog.headlamp.dev/is-catalog
++  // Use query parameter to fetch the services with label catalog.ocne.io/is-catalog
+   const queryParam: QueryParameters = {
+     labelSelector: LABEL_CATALOG + '=',
+   };
