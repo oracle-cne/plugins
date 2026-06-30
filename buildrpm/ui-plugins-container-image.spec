@@ -49,6 +49,9 @@ podman save -o %{app_name}.tar %{docker_tag}
 /usr/local/share/olcne/%{app_name}.tar
 
 %changelog
+* Tue Jun 30 2026 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-13
+- Rebuild with latest base image
+
 * Fri Apr 10 2026 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-12
 - Rebuild with latest base image
 
