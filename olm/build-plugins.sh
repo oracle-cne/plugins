@@ -30,10 +30,10 @@ done
 declare -A plugins_map
 # map in the format 'plugin_name'='plugin-oracle_release_branch'
 plugins_map=(
-  ["app-catalog"]="oracle/release/app-catalog-0.8.0"
-  ["prometheus"]="oracle/release/prometheus-0.8.2"
-  ["cert-manager"]="oracle/release/cert-manager-0.1.0"
-  ["ai-assistant"]="oracle/release/ai-assistant-0.1.0"
+  ["app-catalog"]="oracle/release/app-catalog-0.9.1"
+  ["prometheus"]="oracle/release/prometheus-0.9.1"
+  ["cert-manager"]="oracle/release/cert-manager-0.1.1"
+  ["ai-assistant"]="oracle/release/ai-assistant-0.4.0"
 )
 
 cp ./buildrpm/*.patch /tmp/
