@@ -1,0 +1,168 @@
+--- src/index.tsx
++++ src/index.tsx
+@@ -1,4 +1,10 @@
+-import { registerRoute, registerSidebarEntry } from '@kinvolk/headlamp-plugin/lib';
++import React from 'react';
++import {
++  K8s,
++  registerAppBarAction,
++  registerRoute,
++  registerSidebarEntry,
++} from '@kinvolk/headlamp-plugin/lib';
+ import { CommunityChartList, HelmChartList } from './api/catalogs';
+ import ChartDetails from './components/charts/Details';
+ import { ChartsList } from './components/charts/List';
+@@ -38,6 +44,91 @@
+   return false;
+ }
+ 
++const initializedClusters = new Set<string>();
++const loadingClusters = new Set<string>();
++
++function registerCatalogEntries(chart: Awaited<ReturnType<typeof CatalogLists>>) {
++  for (let i = 0; i < chart.length; i++) {
++    // Register the sidebar for Apps, with the URL pointing to the first chart returned.
++    if (i === 0) {
++      registerSidebarEntry({
++        name: 'Helm',
++        url: '/apps/' + chart[i].name,
++        icon: 'mdi:apps-box',
++        parent: '',
++        label: 'Apps',
++      });
++    }
++
++    registerSidebarEntry({
++      name: 'Charts ' + chart[i].name,
++      url: '/apps/' + chart[i].name,
++      icon: '',
++      parent: 'Helm',
++      label: chart[i].displayName,
++    });
++
++    if (i === chart.length - 1) {
++      registerSidebarEntry({
++        name: 'Releases',
++        url: '/apps/installed',
++        icon: '',
++        parent: 'Helm',
++        label: 'Installed',
++      });
++    }
++
++    if (chart[i].protocol === HELM_PROTOCOL) {
++      registerRoute({
++        path: '/apps/' + chart[i].name,
++        sidebar: 'Charts ' + chart[i].name,
++        name: 'Charts ' + chart[i].name,
++        exact: true,
++        component: () => HelmChartList(chart[i].metadataName, chart[i].namespace, chart[i].uri),
++      });
++    } else if (chart[i].protocol === ARTIFACTHUB_PROTOCOL) {
++      registerRoute({
++        path: '/apps/' + chart[i].name,
++        sidebar: 'Charts ' + chart[i].name,
++        name: 'Charts ' + chart[i].name,
++        exact: true,
++        component: () =>
++          CommunityChartList(chart[i].metadataName, chart[i].namespace, chart[i].uri),
++      });
++    }
++  }
++}
++
++function AppCatalogInitializer() {
++  const cluster = K8s.useCluster();
++
++  React.useEffect(() => {
++    if (!cluster || initializedClusters.has(cluster) || loadingClusters.has(cluster)) {
++      return;
++    }
++
++    loadingClusters.add(cluster);
++    console.debug('[app-catalog] Discovering catalog services', { cluster });
++    CatalogLists()
++      .then(chart => {
++        registerCatalogEntries(chart);
++        initializedClusters.add(cluster);
++        console.debug('[app-catalog] Registered catalog sidebar entries', {
++          cluster,
++          catalogCount: chart.length,
++        });
++      })
++      .catch(error => {
++        console.error('[app-catalog] Failed to discover catalog services', { cluster, error });
++      })
++      .finally(() => {
++        loadingClusters.delete(cluster);
++      });
++  }, [cluster]);
++
++  return null;
++}
++
+ if (isElectron()) {
+   registerSidebarEntry({
+     name: 'Helm',
+@@ -63,60 +149,7 @@
+     label: 'Installed',
+   });
+ } else {
+-  // Iterate the list of catalogs to register the sidebar and the respective routes
+-  CatalogLists().then(chart => {
+-    for (let i = 0; i < chart.length; i++) {
+-      // Register the sidebar for Apps, with the URL pointing to the first chart returned
+-      if (i === 0) {
+-        registerSidebarEntry({
+-          name: 'Helm',
+-          url: '/apps/' + chart[i].name,
+-          icon: 'mdi:apps-box',
+-          parent: '',
+-          label: 'Apps',
+-        });
+-      }
+-
+-      // Register the sidebars for the catalogs, as returned by the API
+-      registerSidebarEntry({
+-        name: 'Charts ' + chart[i].name,
+-        url: '/apps/' + chart[i].name,
+-        icon: '',
+-        parent: 'Helm',
+-        label: chart[i].displayName,
+-      });
+-
+-      // Register the sidebar with label - Installed, as the last entry under Apps
+-      if (i === chart.length - 1) {
+-        registerSidebarEntry({
+-          name: 'Releases',
+-          url: '/apps/installed',
+-          icon: '',
+-          parent: 'Helm',
+-          label: 'Installed',
+-        });
+-      }
+-
+-      if (chart[i].protocol === HELM_PROTOCOL) {
+-        registerRoute({
+-          path: '/apps/' + chart[i].name,
+-          sidebar: 'Charts ' + chart[i].name,
+-          name: 'Charts ' + chart[i].name,
+-          exact: true,
+-          component: () => HelmChartList(chart[i].metadataName, chart[i].namespace, chart[i].uri),
+-        });
+-      } else if (chart[i].protocol === ARTIFACTHUB_PROTOCOL) {
+-        registerRoute({
+-          path: '/apps/' + chart[i].name,
+-          sidebar: 'Charts ' + chart[i].name,
+-          name: 'Charts ' + chart[i].name,
+-          exact: true,
+-          component: () =>
+-            CommunityChartList(chart[i].metadataName, chart[i].namespace, chart[i].uri),
+-        });
+-      }
+-    }
+-  });
++  registerAppBarAction(AppCatalogInitializer);
+ }
+ 
+ registerRoute({
