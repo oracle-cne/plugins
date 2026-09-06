@@ -48,6 +48,7 @@ for current_plugin in "${!plugins_map[@]}"; do
   if [[ "$current_plugin" == "app-catalog" ]];then
     patch -p0 < /tmp/app-catalog-api-catalogs.patch
     patch -p0 < /tmp/app-catalog-helpers-catalog.patch
+    patch -p0 < /tmp/app-catalog-cluster-initializer.patch
   fi
   npm install
   # Build the plugin
