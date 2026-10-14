@@ -9,7 +9,7 @@
 %{!?registry: %global registry container-registry.oracle.com/olcne}
 %global app_name               ui-plugins
 %global app_version            2.0.0
-%global oracle_release_version 13
+%global oracle_release_version 15
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 %global plugins_dest           build-plugins
 
@@ -49,6 +49,9 @@ podman save -o %{app_name}.tar %{docker_tag}
 /usr/local/share/olcne/%{app_name}.tar
 
 %changelog
+* Fri Oct 09 2026 Oracle Cloud Native Environment Authors <noreply@oracle.com> - 2.0.0-15
+- Update ai-assistant to 0.4.1 and rebuild all selected plugins
+
 * Fri Aug 21 2026 Daniel Krasinski <daniel.krasinski@oracle.com> - 2.0.0-14
 - Rebuild with latest base image
 

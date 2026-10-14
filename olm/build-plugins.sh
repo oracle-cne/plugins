@@ -33,7 +33,7 @@ plugins_map=(
   ["app-catalog"]="oracle/release/app-catalog-0.9.1"
   ["prometheus"]="oracle/release/prometheus-0.9.1"
   ["cert-manager"]="oracle/release/cert-manager-0.1.1"
-  ["ai-assistant"]="oracle/release/ai-assistant-0.4.0"
+  ["ai-assistant"]="oracle/release/ai-assistant-0.4.1"
 )
 
 cp ./buildrpm/*.patch /tmp/
