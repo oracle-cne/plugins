@@ -1,0 +1,9 @@
+@Library('olcne-pipeline') _
+import com.oracle.olcne.pipeline.BranchPattern
+
+imagePipeline(
+  branchPattern: new BranchPattern(master: 'main', feature: '^[0-9]+-.*'),
+  platforms: ['ol8'],
+  architectures: ['x86_64'],
+  buildScript: "echo nothing to do"
+)
