@@ -9,7 +9,7 @@
 %{!?registry: %global registry container-registry.oracle.com/olcne}
 %global app_name               ui-plugins
 %global app_version            2.0.0
-%global oracle_release_version 15
+%global oracle_release_version 16
 %global _buildhost             build-ol%{?oraclelinux}-%{?_arch}.oracle.com
 %global plugins_dest           build-plugins
 
@@ -21,7 +21,8 @@ License:        Apache-2.0
 Group:          System/Management
 Url:            https://github.com/oracle-cne/plugins
 Source:         %{name}-%{version}.tar.bz2
-BuildRequires:  nodejs >= 18.14
+BuildRequires:  nodejs >= 1:22.12.0
+BuildRequires:  npm
 
 %description
 Plugins for the Oracle Cloud Native Environment UI.
@@ -49,6 +50,9 @@ podman save -o %{app_name}.tar %{docker_tag}
 /usr/local/share/olcne/%{app_name}.tar
 
 %changelog
+* Tue Nov 24 2026 Oracle Cloud Native Environment Authors <noreply@oracle.com> - 2.0.0-16
+- Update ai-assistant to 0.5.0 and rebuild all selected plugins with Node.js 22
+
 * Fri Oct 09 2026 Oracle Cloud Native Environment Authors <noreply@oracle.com> - 2.0.0-15
 - Update ai-assistant to 0.4.1 and rebuild all selected plugins
 
